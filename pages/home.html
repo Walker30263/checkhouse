@@ -22,5 +22,60 @@
   <body>
     <h1>Checkhouse - Chess but Cursed</h1>
     <h3>Crazyhouse + Three-Check + Coding while sleep-deprived = ???</h3>
+    <div class="wrapper">
+      <div>
+        <div id="profileContainer">
+          <div id="profilePictureContainer"></div>
+          <div id="username"></div>
+          <div id="guestUsernameInputContainer">
+            <!-- Input validation script credit: https://stackoverflow.com/a/46903763 -->
+            Play as <input id="guestUsernameInput" type="text" maxlength="20" class="contentTheme" onkeypress="return event.charCode >= 48 && event.charCode <= 57 || event.charCode >= 97 && event.charCode <= 122 || event.charCode >= 65 && event.charCode <= 90 || event.charCode == 32">
+          </div>
+          <div id="loginOrRegister">
+            <button id="login" class="contentTheme">Login</button>
+            <button id="register" class="contentTheme">Register</button>
+          </div>
+        </div>
+      </div>
+      <div id="newGameContainer">
+        <div id="gameSettings">
+          <div id="preferredColorContainer">
+            <h2>Preferred Color:</h2>
+            <div id="blackPref" class="contentTheme">Black</div>
+            <div id="noPref" class="contentTheme">No Preference</div>
+            <div id="whitePref" class="contentTheme">White</div>
+          </div>
+          <div id="timeControlContainer">
+            <h2>Timer [minutes/side + increment/move (s)]:</h2>
+            <h4>Blitz</h4>
+            <div id="time_3+0" class="contentTheme">3+0</div>
+            <div id="time_5+0" class="contentTheme">5+0</div>
+            <div id="time_5+3" class="contentTheme">5+3</div>
+            <h4>Rapid</h4>
+            <div id="time_10+0" class="contentTheme">10+0</div>
+            <div id="time_10+5" class="contentTheme">10+5</div>
+            <div id="time_10+10" class="contentTheme">10+10</div>
+            <h4>Classical</h4>
+            <div id="time_20+0" class="contentTheme">20+0</div>
+            <div id="time_20+5" class="contentTheme">20+5</div>
+            <div id="time_20+10" class="contentTheme">20+10</div>
+            <div id="time_30+0" class="contentTheme">30+0</div>
+            <div id="time_30+5" class="contentTheme">30+5</div>
+            <div id="time_30+10" class="contentTheme">30+10</div>
+            <div id="time_30+30" class="contentTheme">30+30</div>
+            <div id="unlimitedTime" class="contentTheme">Unlimited</div>
+          </div>
+        </div>
+        <div class="wrapper">
+          <button id="createGame" class="contentTheme">Play with a Friend</button>
+          <button id="randomMatchmake" class="contentTheme">Random Matchmaking</button>
+        </div>
+        <div id="matchmakingLoader">
+          <h1>Matchmaking...</h1>
+          <div class="loader"></div>
+          <button class="contentTheme" id="cancelMatchmaking">Cancel</button>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

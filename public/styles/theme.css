@@ -1,12 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Comfortaa&family=Noto+Sans+Avestan&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caudex&family=Lexend+Deca:wght@300&display=swap');
 
 :root {
   --page-bg-color: #E3D7FF;
   --page-text-color: #000000;
   --content-bg-color: #AFA2FF;
   --content-text-color: #000000;
-  --secondary-content-bg-color: #7A89C2;
-  --secondary-content-text-color: #FFFFFF;
+  --secondary-content-bg-color: #99ffb2;
+  --secondary-content-text-color: #000000;
 }
 
 body {
