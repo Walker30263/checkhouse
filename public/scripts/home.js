@@ -11,6 +11,8 @@ let randomMatchmake = document.getElementById("randomMatchmake");
 let matchmakingLoader = document.getElementById("matchmakingLoader");
 let cancelMatchmaking = document.getElementById("cancelMatchmaking");
 
+let pfp = "default";
+
 window.onload = function() {
   let token = localStorage.getItem("token") || sessionStorage.getItem("token");
 
@@ -93,8 +95,25 @@ for (let i = 0; i < timeControlOptions.length; i++) {
   });
 }
 
-createGame.addEventListener("click", function() {
+createGame.addEventListener("click", async function() {
+  let token = localStorage.getItem("token") || sessionStorage.getItem("token");
+  let data = {
+    playerInfo: {}
+  };
+
+  if (token === null) {
+    data.playerInfo.guest = true;
+    data.playerInfo.username = username.textContent;
+  } else {
+    data.playerInfo.guest = false;
+  }
+
+  data.playerInfo.pfp = pfp;
+
+  data.gameSettings = getGameSettings();
   
+  let res = await fetchWrapper('POST', '/create', data);
+  console.log(res);
 });
 
 randomMatchmake.addEventListener("click", function() {
