@@ -9,44 +9,21 @@ const io = new Server(server);
 const sqlite3 = require("sqlite3").verbose();
 const jwt = require('jsonwebtoken');
 
+const { Game, Member } = require("./classes.js");
+
 let activeGames = [];
-
-class Game {
-  constructor(challenger, id, settings) {
-    this.challenger = new Member(challenger.id, challenger.guest, challenger.username, challenger.profilePicture);
-    this.players = [this.challenger];
-    this.id = id;
-    this.settings = settings;
-    this.playerChat = [];
-    this.spectatorChat = [];
-  }
-
-  hasPlayer(id) {
-    for (let i = 0; i < this.players.length; i++) {
-      if (this.players[i].id === id) {
-        return true;
-        break;
-      }
-    }
-
-    return false;
-  }
-}
-
-class Member {
-  constructor(id, guest, name, profilePicture = "default") {
-    this.id = id;
-    this.guest = guest;
-    this.name = name;
-    this.profilePicture = profilePicture;
-  }
-}
 
 app.use(express.static("public")); //client-side css and js files
 app.use(express.json()); //parse JSON in incoming requests
 
 app.get('/', (req, res) => {
   res.sendFile(__dirname + "/pages/home.html");
+});
+
+//checkhouse.cf/(game id) = page for a specific game just like Lichess
+//(Lichess pls don't sue us thx)
+app.get('/:gameId', (req, res) => {
+  res.sendFile(__dirname + "/pages/game.html");
 });
 
 //THIS HAS TO BE KEPT AT THE END OF THE ROUTING SECTION OF THE CODE
@@ -75,9 +52,9 @@ db.serialize(() => {
     friends TEXT,
     incoming_friend_requests TEXT,
     outgoing_friend_requests TEXT
-  )`);*/
+  )`);
 
-  /*db.run(`CREATE TABLE IF NOT EXISTS games(
+  db.run(`CREATE TABLE IF NOT EXISTS games(
     game_id TEXT PRIMARY KEY,
     game_data TEXT
   )`);*/
@@ -105,12 +82,10 @@ db.close((err) => {
 });
 
 app.post('/create', async (req, res) => {
-  let data = req.body;
-  
   let tempId = generateTempChallengerId();
-  let challenger = new Member(tempId, data.playerInfo.guest, data.playerInfo.username, data.playerInfo.pfp);
+  let challenger = new Member(tempId, req.body.playerInfo.guest, req.body.playerInfo.username, req.body.playerInfo.pfp);
   let gameId = await generateGameId();
-  let game = new Game(challenger, gameId, data.gameSettings);
+  let game = new Game(challenger, gameId, req.body.gameSettings);
   activeGames.push(game);
 
   let tempData = {
@@ -132,7 +107,106 @@ app.post('/create', async (req, res) => {
 });
 
 io.on("connection", (socket) => {
+  socket.on("log", () => {
+    console.log(activeGames);
+  });
   
+  socket.on("requestGameInfo", async (token, gameId) => {
+    let gameStatus = await verifyGameId(gameId);
+
+    console.log(gameStatus);
+
+    if (gameStatus === "active") {
+      if (token.type === "tempChallenger") {
+        jwt.verify(token.token, process.env['JWT_PRIVATE_KEY'], function(err, data) {
+          if (err) {
+            console.log(err);
+          } else {
+            for (let i = 0; i < activeGames.length; i++) {
+              if (activeGames[i].id === gameId) {
+                if (activeGames[i].inProgress) {
+                  
+                } else {
+                  activeGames[i].updateMemberId(data.tempId, socket.id);
+
+                  //give them a refresh token so they can get back into the game if they accidentally close the tab
+                  let refreshTokenObj = {
+                    id: socket.id,
+                    gameId: gameId
+                  }
+
+                  jwt.sign(refreshTokenObj, process.env['JWT_PRIVATE_KEY'], (err, refreshToken) => {
+                    if (err) {
+                      console.log(err);
+                    } else {
+                      socket.emit("display", activeGames[i], gameStatus, refreshToken);
+                    }
+                  });
+                }
+                break;
+              }
+            }
+          }
+        });
+      } else if (token.type === "refresh") {
+        //ill deal with this later
+      } else if (token.type == "null") {
+        for (let i = 0; i < activeGames.length; i++) {
+          if (activeGames[i].id === gameId) {
+            if (activeGames[i].inProgress) {
+              //it's just a spectator
+            } else {
+              let player = new Member(socket.id, true, "Guest User", "default");
+              activeGames[i].players.push(player);
+
+              activeGames[i].start();
+
+              activeGames[i].players.forEach(player => {
+                socket.to(player.id).emit("display", activeGames[i], gameStatus);
+              });
+            }
+          }
+        }
+      }
+    } else if (gameStatus === "past") {
+      let db = new sqlite3.Database(__dirname + "/database/data.db", (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+
+      db.get(`SELECT * FROM games WHERE game_id = ?`, [gameId], (err, row) => {
+        socket.emit("display", row.game_data, gameStatus);
+        
+        db.close((err) => {
+          if (err) {
+            console.log(err);
+          }
+        });
+      });
+    } else if (gameStatus === "invalid") {
+      socket.emit("invalidGameId");
+    }
+  });
+
+  socket.on("chatMessageSend", (message) => {
+    for (let i = 0; i < activeGames.length; i++) {
+      if (activeGames[i].hasPlayer(socket.id)) {
+        activeGames[i].newMessage(activeGames[i].getPlayerUsername(socket.id), message, Date.now(), "playerChat");
+        
+        for (let j = 0; j < activeGames[i].players.length; j++) {
+          if (activeGames[i].players[j].id !== socket.id) {
+            socket.to(activeGames[i].players[j].id).emit("chatMessageReceive", activeGames[i].getPlayerUsername(socket.id), message);
+            break;
+          }
+        }
+      }
+      
+      break;
+    }
+  });
+
+
 });
 
 server.listen(process.env['PORT'], () => {
@@ -230,3 +304,49 @@ function generateTempChallengerId() {
     return generateTempChallengerId();
   } 
 }
+
+/*
+Verify if game ID exists and if so, what type of game it is
+Returns either "active", "past", or "invalid"
+Parameter: string gameId to be checked
+returns a promise because it checks through the database of past games
+*/
+
+async function verifyGameId(gameId) {
+  return new Promise((resolve, reject) => {
+    //first check if it's active
+    let active = false;
+
+    for (let i = 0; i < activeGames.length; i++) {
+      if (activeGames[i].id === gameId) {
+        active = true;
+        break;
+      }
+    }
+
+    if (active) {
+      resolve("active");
+    } else { //check the database to see if it's a past game
+      let db = new sqlite3.Database(__dirname + "/database/data.db", (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+
+      db.all(`SELECT game_id FROM games WHERE game_id = ?`, [gameId], function(err, rows) {
+        db.close((err) => {
+          if (err) {
+            console.log(err);
+          }
+        });
+        
+        if (rows.length === 0) { //if no entries were found...
+          resolve("invalid");
+        } else { //if entries WERE found...
+          resolve("past");
+        }
+      });
+    }
+  });
+}
+

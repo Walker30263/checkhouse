@@ -1,0 +1,85 @@
+@import './theme.css';
+
+* {
+  text-align: center;
+  font-family: 'Lexend Deca', sans-serif;
+}
+
+:root {
+  scroll-behavior: smooth;
+}
+
+button {
+  font-size: 1.5em;
+  border-radius: 22px;
+  padding: 10px;
+  margin: 15px;
+  transition: 0.2s;
+  border: 2px solid;
+}
+
+button:hover {
+  filter: brightness(1.1);
+  cursor: pointer;
+  transform: scale(1.05);
+}
+
+#invalidGameCodeContainer {
+  display: none;
+  width: 70vw;
+  margin: 15vh auto;
+  padding: 20px;
+  border-radius: 22px;
+}
+
+#chatContainer {
+  display: none;
+  width: 25vw;
+  margin-left: 25px;
+  margin-top: 50px;
+  border-radius: 22px;
+  padding-top: 10px;
+  overflow-wrap: break-word;
+}
+
+#messages {
+  list-style-type: none;
+  overflow: scroll;
+  overflow-x: hidden;
+  height: 30vh;
+  max-height: 30vh;
+  border: 2px solid;
+  width: 80%;
+  margin: auto;
+}
+
+#messages > li {
+  text-align: left;
+}
+
+#chatInput {
+  border: 2px solid;
+  font-size: 1.2em;
+  width: 60%;
+  margin: 10px 5%;
+  border-radius: 22px;
+  display: inline-block;
+}
+
+#chatForm > button {
+  display: inline-block;
+  font-size: 1.3em;
+  border-radius: 22px;
+  padding: 2px 10px;
+  cursor: pointer;
+  width: 15%;
+}
+
+#chatForm > button:hover {
+  filter: brightness(1.15);
+}
+
+#board {
+  width: 500px;
+  margin: auto;
+}

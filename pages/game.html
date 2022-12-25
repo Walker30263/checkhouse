@@ -18,6 +18,7 @@
     <title>Checkhouse</title>
     <link rel="stylesheet" href="/styles/game.css">
     <script src="/scripts/game.js" defer></script>
+    <script src="/socket.io/socket.io.js"></script>
 
     <!-- Importing chessboard.js -->
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css" integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU" crossorigin="anonymous">
@@ -26,7 +27,17 @@
   </head>
   <body>
     <div id="invalidGameCodeContainer">
-      
+      <h1>Invalid Game Code</h1>
+      <button id="redirectToMainPage" class="secondaryContentTheme">Redirect to Main Page</button>
     </div>
+    <div id="chatContainer" class="contentTheme">
+      <h1>Chat:</h1>
+      <ul id="messages"></ul>
+      <form id="chatForm">
+        <input id="chatInput" class="secondaryContentTheme" autocomplete="off">
+        <button type="submit" class="contentTheme">📨</button>
+      </form>
+    </div>
+    <div id="board"></div>
   </body>
 </html>

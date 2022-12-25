@@ -22,6 +22,11 @@ window.onload = function() {
     profilePictureContainer.appendChild(img);
     username.textContent = "Guest User";
     guestUsernameInputContainer.style.display = "block";
+
+    if (localStorage.getItem("guestUsername")) {
+      guestUsernameInput.value = localStorage.getItem("guestUsername");
+      username.textContent = guestUsernameInput.value + " (Guest User)";
+    }
   } else {
     
   }
@@ -56,6 +61,7 @@ window.onload = function() {
 guestUsernameInput.addEventListener("input", function() {
   if (guestUsernameInput.value) {
     username.textContent = guestUsernameInput.value + " (Guest User)";
+    localStorage.setItem("guestUsername", guestUsernameInput.value);
   } else {
     username.textContent = "Guest User";
   }
@@ -113,7 +119,8 @@ createGame.addEventListener("click", async function() {
   data.gameSettings = getGameSettings();
   
   let res = await fetchWrapper('POST', '/create', data);
-  console.log(res);
+  localStorage.setItem("tempChallengerToken", res.data.token);
+  window.location.href = `/${res.data.gameId}`;
 });
 
 randomMatchmake.addEventListener("click", function() {
@@ -121,7 +128,6 @@ randomMatchmake.addEventListener("click", function() {
   this.parentElement.style.display = "none";
   matchmakingLoader.style.display = "block";
   cancelMatchmaking.style.display = "block";
-  alert(JSON.stringify(getGameSettings()));
 });
 
 cancelMatchmaking.addEventListener("click", function() {
