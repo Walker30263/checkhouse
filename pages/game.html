@@ -26,9 +26,30 @@
     <script src="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.js" integrity="sha384-8Vi8VHwn3vjQ9eUHUxex3JSN/NFqUg3QbPyX8kWyb93+8AC/pPWTzj+nHtbC5bxD" crossorigin="anonymous"></script>
   </head>
   <body>
+    <div id="requestGuestUserForScreenNameContainer">
+      <h1>Join Game as Guest</h1>
+      <div id="profilePictureContainer"></div>
+      <div id="username"></div>
+      <div id="guestUsernameInputContainer">
+        <!-- Input validation script credit: https://stackoverflow.com/a/46903763 -->
+        Play as <input id="guestUsernameInput" type="text" maxlength="20" class="contentTheme" onkeypress="return event.charCode >= 48 && event.charCode <= 57 || event.charCode >= 97 && event.charCode <= 122 || event.charCode >= 65 && event.charCode <= 90 || event.charCode == 32">
+      </div>
+      <button id="joinAsGuest" class="contentTheme">Join</button>
+      <h1>Or...</h1>
+      <div id="loginOrRegister">
+        <button id="login" class="contentTheme">Login</button>
+        <button id="register" class="contentTheme">Register</button>
+      </div>
+    </div>
     <div id="invalidGameCodeContainer">
       <h1>Invalid Game Code</h1>
       <button id="redirectToMainPage" class="secondaryContentTheme">Redirect to Main Page</button>
+    </div>
+    <div id="inviteSomeoneContainer" class="contentTheme">
+      <h1>Challenge to a game</h1>
+      <div id="gameInfo">
+        
+      </div>
     </div>
     <div id="chatContainer" class="contentTheme">
       <h1>Chat:</h1>

@@ -111,10 +111,13 @@ io.on("connection", (socket) => {
     console.log(activeGames);
   });
   
-  socket.on("requestGameInfo", async (token, gameId) => {
+  socket.on("requestGameInfo", async (token, gameId, guestUsernameWhenAcceptingChallenge) => {
     let gameStatus = await verifyGameId(gameId);
 
     console.log(gameStatus);
+    console.log(gameId);
+    console.log(token);
+    console.log('~~~~~~~~~~~~~~~~~~~~');
 
     if (gameStatus === "active") {
       if (token.type === "tempChallenger") {
@@ -149,19 +152,26 @@ io.on("connection", (socket) => {
           }
         });
       } else if (token.type === "refresh") {
-        //ill deal with this later
+        jwt.verify(token.token, process.env['JWT_PRIVATE_KEY'], function(err, data) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(data);
+          }
+        });
       } else if (token.type == "null") {
         for (let i = 0; i < activeGames.length; i++) {
           if (activeGames[i].id === gameId) {
             if (activeGames[i].inProgress) {
               //it's just a spectator
             } else {
-              let player = new Member(socket.id, true, "Guest User", "default");
+              let player = new Member(socket.id, true, guestUsernameWhenAcceptingChallenge, "default");
               activeGames[i].players.push(player);
 
               activeGames[i].start();
 
               activeGames[i].players.forEach(player => {
+                console.log(player.id);
                 socket.to(player.id).emit("display", activeGames[i], gameStatus);
               });
             }

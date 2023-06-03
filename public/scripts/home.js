@@ -2,6 +2,8 @@ let profilePictureContainer = document.getElementById("profilePictureContainer")
 let username = document.getElementById("username");
 let guestUsernameInputContainer = document.getElementById("guestUsernameInputContainer");
 let guestUsernameInput = document.getElementById("guestUsernameInput");
+let btnOpenLoginScreen = document.getElementById("login");
+let btnOpenRegisterScreen = document.getElementById("register");
 
 let preferredColorOptions = document.querySelectorAll("#preferredColorContainer > div");
 let timeControlOptions = document.querySelectorAll("#timeControlContainer > div");
