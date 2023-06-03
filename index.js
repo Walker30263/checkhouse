@@ -1,13 +1,24 @@
 const express = require("express");
 const app = express();
+app.use(express.urlencoded());
+
 const http = require("http");
 const server = http.createServer(app);
+
+//const validator = require("validator");
+//const multer  = require('multer');
+//const upload = multer();
 
 const { Server } = require("socket.io");
 const io = new Server(server);
 
 const sqlite3 = require("sqlite3").verbose();
+//const { verify } = require("hcaptcha");
 const jwt = require('jsonwebtoken');
+//const bcrypt = require("bcrypt");
+
+//const sendgridMailer = require('@sendgrid/mail');
+//sendgridMailer.setApiKey(process.env['SENDGRID_API_KEY']);
 
 const { Game, Member } = require("./classes.js");
 
@@ -16,8 +27,34 @@ let activeGames = [];
 app.use(express.static("public")); //client-side css and js files
 app.use(express.json()); //parse JSON in incoming requests
 
+app.use('/login', require("./routes/account-handling/Login.js"));
+app.use('/register', require("./routes/account-handling/Register.js"));
+app.use('/verify-email', require("./routes/account-handling/Verify_Email.js"));
+app.use('/request-password-reset', require("./routes/account-handling/Request_Password_Reset.js"));
+app.use('/validate-password-reset-token', require("./routes/account-handling/Validate_Password_Reset_Token.js"));
+app.use('/new-password', require("./routes/account-handling/New_Password.js"));
+
+app.use('/user-info', require("./routes/user-info-handling/User_Info.js"));
+
 app.get('/', (req, res) => {
   res.sendFile(__dirname + "/pages/home.html");
+});
+
+app.get('/rules', (req, res) => {
+  res.sendFile(__dirname + "/pages/rules.html");
+});
+
+app.get('/tos', (req, res) => {
+  res.sendFile(__dirname + "/pages/tos.html");
+  //res.redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+});
+
+app.get('/forgot-password', (req, res) => {
+  res.sendFile(__dirname + "/pages/forgot-password.html");
+});
+
+app.get('/verify-email', (req, res) => {
+  res.sendFile(__dirname + "/pages/verify-email.html");
 });
 
 //checkhouse.cf/(game id) = page for a specific game just like Lichess
@@ -47,11 +84,13 @@ db.serialize(() => {
     username TEXT NOT NULL UNIQUE,
     password_hashed TEXT NOT NULL,
     email TEXT UNIQUE,
+    email_verified TEXT,
     profile_picture TEXT,
     bio TEXT,
     friends TEXT,
     incoming_friend_requests TEXT,
-    outgoing_friend_requests TEXT
+    outgoing_friend_requests TEXT,
+    rating INTEGER
   )`);
 
   db.run(`CREATE TABLE IF NOT EXISTS games(
@@ -61,8 +100,8 @@ db.serialize(() => {
 
   //logging database, uncomment following code to log database in console at runtime:
   
-  /*db.all(`SELECT user_id, username, password_hashed, email, bio, friends, incoming_friend_requests, outgoing_friend_requests FROM users`, [], (err, rows) => {
-  db.all(`SELECT * FROM games`, [], (err, rows) => {
+  db.all(`SELECT user_id, username, password_hashed, email, email_verified, bio, friends, incoming_friend_requests, outgoing_friend_requests, rating FROM users`, [], (err, rows) => {
+  //db.all(`SELECT * FROM games`, [], (err, rows) => {
     if (err) {
       console.log(err);
     } else {
@@ -70,7 +109,7 @@ db.serialize(() => {
         console.log(row);
       });
     }
-  });*/
+  });
 });
 
 db.close((err) => {
@@ -156,23 +195,68 @@ io.on("connection", (socket) => {
           if (err) {
             console.log(err);
           } else {
+            let wasValidRefreshToken = false;
+            
+            for (let i = 0; i < activeGames.length; i++) {
+              if (activeGames[i].id === data.gameId) {
+                wasValidRefreshToken = true;
+                activeGames[i].updateMemberId(data.id, socket.id);
+
+                //give them another refresh token so they can get back into the game if they accidentally close the tab
+                let refreshTokenObj = {
+                  id: socket.id,
+                  gameId: data.gameId
+                }
+
+                jwt.sign(refreshTokenObj, process.env['JWT_PRIVATE_KEY'], (err, refreshToken) => {
+                  if (err) {
+                    console.log(err);
+                  } else {
+                    socket.emit("display", activeGames[i], gameStatus, refreshToken);
+                  }
+                });
+              }
+            }
             console.log(data);
+
+            if (!wasValidRefreshToken) { //if refresh token from a past game
+              socket.emit("invalidRefreshTokenRetryWithNullToken");
+              console.log("invalid refresh token...retrying with null token");
+            }
+            
+            console.log("---------------");
           }
         });
       } else if (token.type == "null") {
         for (let i = 0; i < activeGames.length; i++) {
           if (activeGames[i].id === gameId) {
             if (activeGames[i].inProgress) {
-              //it's just a spectator
+              socket.emit("display", activeGames[i], gameStatus, null, true)
             } else {
               let player = new Member(socket.id, true, guestUsernameWhenAcceptingChallenge, "default");
               activeGames[i].players.push(player);
 
               activeGames[i].start();
 
-              activeGames[i].players.forEach(player => {
-                console.log(player.id);
-                socket.to(player.id).emit("display", activeGames[i], gameStatus);
+              //give them a refresh token so they can get back into the game if they accidentally close the tab
+              let refreshTokenObj = {
+                id: socket.id,
+                gameId: gameId
+              }
+
+              jwt.sign(refreshTokenObj, process.env['JWT_PRIVATE_KEY'], (err, refreshToken) => {
+                if (err) {
+                  console.log(err);
+                } else {
+                  activeGames[i].players.forEach(player => {
+                    console.log(player.id);
+                    if (player.id === socket.id) {
+                      socket.emit("display", activeGames[i], gameStatus, refreshToken);
+                    } else {
+                      socket.to(player.id).emit("display", activeGames[i], gameStatus);
+                    }
+                  });
+                }
               });
             }
           }
@@ -359,4 +443,3 @@ async function verifyGameId(gameId) {
     }
   });
 }
-

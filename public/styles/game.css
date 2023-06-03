@@ -10,6 +10,12 @@
   scroll-behavior: smooth;
 }
 
+.wrapper {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
 button {
   font-size: 1.5em;
   border-radius: 22px;
@@ -69,7 +75,6 @@ img {
 }
 
 #guestUsernameInputContainer {
-  display: none;
   font-size: 1.2em;
   margin-top: 7px;
 }
@@ -92,13 +97,30 @@ img {
 
 #inviteSomeoneContainer {
   display: none;
-  width: 70vw;
+  width: 90vw;
   margin: 25px auto;
+  padding: 20px;
+  border-radius: 9px;
+}
+
+#inviteSomeoneContainer > .wrapper > div {
+  margin: 10px 20px;
+  padding: 10px 25px;
+  border-radius: 22px;
+}
+
+#inviteURL {
+  padding: 5px 10px;
+}
+
+#searchForUsername {
+  padding: 5px 10px;
+  border-radius: 15px;
+  border-width: 0px;
 }
 
 #chatContainer {
   display: none;
-  width: 25vw;
   margin-left: 25px;
   margin-top: 50px;
   border-radius: 22px;
@@ -147,4 +169,14 @@ img {
   width: 500px;
   margin: auto;
   display: none;
+}
+
+/* For mobile: */
+@media only screen and (max-width: 550px) {
+  
+}
+
+/* For laptop/PC/wide screens: */
+@media only screen and (min-width: 550px) {
+  
 }

@@ -1,9 +1,15 @@
+const swalAlertColor = {
+  iconColor: '#FFFFFF',
+  backgroundColor: '#321a47',
+  color: '#FFFFFF'
+};
+
+let loginOrRegister = document.getElementById("loginOrRegister");
 let profilePictureContainer = document.getElementById("profilePictureContainer");
 let username = document.getElementById("username");
+let bio = document.getElementById("bio");
 let guestUsernameInputContainer = document.getElementById("guestUsernameInputContainer");
 let guestUsernameInput = document.getElementById("guestUsernameInput");
-let btnOpenLoginScreen = document.getElementById("login");
-let btnOpenRegisterScreen = document.getElementById("register");
 
 let preferredColorOptions = document.querySelectorAll("#preferredColorContainer > div");
 let timeControlOptions = document.querySelectorAll("#timeControlContainer > div");
@@ -15,10 +21,11 @@ let cancelMatchmaking = document.getElementById("cancelMatchmaking");
 
 let pfp = "default";
 
-window.onload = function() {
-  let token = localStorage.getItem("token") || sessionStorage.getItem("token");
+window.onload = async function() {
+  let account_token = localStorage.getItem("account_token") || sessionStorage.getItem("account_token");
 
-  if (token === null) {
+  if (account_token === null) {
+    loginOrRegister.style.display = "block";
     let img = document.createElement("img");
     img.src = "/assets/anonymous-pfp.png";
     profilePictureContainer.appendChild(img);
@@ -30,7 +37,34 @@ window.onload = function() {
       username.textContent = guestUsernameInput.value + " (Guest User)";
     }
   } else {
-    
+    loginOrRegister.style.display = "none";
+
+    let response = await fetchWrapper("POST", "/user-info", {
+      account_token: account_token
+    });
+
+    console.log(response);
+
+    if (response.data.profile_picture === "defaultAvatar") {
+      let img = document.createElement("img");
+      img.src = "/assets/default_avatar_pride.png";
+      profilePictureContainer.appendChild(img);
+    } else {
+      //figure out custom pfps later
+    }
+
+    username.textContent = response.data.username;
+    bio.textContent = response.data.bio;
+
+    if (response.error) {
+      if (response.error.title === "Invalid Account Token") {
+        localStorage.removeItem("account_token");
+        sessionStorage.removeItem("account_token");
+        location.reload();
+      } else {
+        swalError(response.error.title, response.error.message);
+      }
+    }
   }
 
   if (localStorage.getItem("colorPreference")) {
@@ -104,12 +138,12 @@ for (let i = 0; i < timeControlOptions.length; i++) {
 }
 
 createGame.addEventListener("click", async function() {
-  let token = localStorage.getItem("token") || sessionStorage.getItem("token");
+  let account_token = localStorage.getItem("account_token") || sessionStorage.getItem("account_token");
   let data = {
     playerInfo: {}
   };
 
-  if (token === null) {
+  if (account_token === null) {
     data.playerInfo.guest = true;
     data.playerInfo.username = username.textContent;
   } else {
@@ -121,7 +155,7 @@ createGame.addEventListener("click", async function() {
   data.gameSettings = getGameSettings();
   
   let res = await fetchWrapper('POST', '/create', data);
-  localStorage.setItem("tempChallengerToken", res.data.token);
+  sessionStorage.setItem("tempChallengerToken", res.data.token);
   window.location.href = `/${res.data.gameId}`;
 });
 
@@ -137,6 +171,118 @@ cancelMatchmaking.addEventListener("click", function() {
   cancelMatchmaking.style.display = "none";
   document.getElementById("gameSettings").style.display = "block";
   document.querySelector("#newGameContainer > .wrapper").style.display = "block";
+});
+
+
+
+/* Login/Register */
+
+let btnOpenLoginScreen = document.getElementById("login");
+let btnOpenRegisterScreen = document.getElementById("register");
+let loginOrRegisterFormsContainer = document.getElementById("loginOrRegisterFormsContainer");
+let btnSwitchToLoginForm = document.getElementById("btnSwitchToLoginForm");
+let btnSwitchToRegisterForm = document.getElementById("btnSwitchToRegisterForm");
+
+let loginForm = document.getElementById("loginForm");
+let registerForm = document.getElementById("registerForm");
+
+let rememberMe = document.getElementById("rememberMe");
+
+btnOpenLoginScreen.addEventListener("click", function() {
+  loginForm.style.display = "block";
+  registerForm.style.display = "none";
+  openOverlay();
+});
+
+btnOpenRegisterScreen.addEventListener("click", function() {
+  loginForm.style.display = "none";
+  registerForm.style.display = "block";
+  openOverlay();
+});
+
+btnSwitchToLoginForm.addEventListener("click", function() {
+  loginForm.style.display = "block";
+  registerForm.style.display = "none";
+});
+
+btnSwitchToRegisterForm.addEventListener("click", function() {
+  loginForm.style.display = "none";
+  registerForm.style.display = "block";
+});
+
+/* Open when someone clicks on the span element */
+function openOverlay() {
+  loginOrRegisterFormsContainer.style.height = "100%";
+}
+
+/* Close when someone clicks on the "x" symbol inside the overlay */
+function closeOverlay() {
+  loginOrRegisterFormsContainer.style.height = "0%";
+}
+
+loginForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  let response = await fetch('/login', {
+    method: "POST",
+    body: new FormData(loginForm)
+  });
+
+  let result = await response.json();
+
+  if (result.error) {
+    swalError(result.error.title, result.error.message);
+    hcaptcha.reset();
+  } else if (result.success) {
+    Swal.fire({
+      title: result.success.title,
+      html: result.success.message,
+      icon: "success",
+      iconColor: swalAlertColor.iconColor,
+      background: swalAlertColor.backgroundColor,
+      color: swalAlertColor.color,
+      didClose: () => {
+        loginForm.reset();
+
+        if (rememberMe.checked) {
+          localStorage.setItem("account_token", result.success.token);
+        } else {
+          sessionStorage.setItem("account_token", result.success.token);
+        }
+        
+        location.reload();
+      }
+    });
+  }
+});
+
+registerForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  let response = await fetch('/register', {
+    method: "POST",
+    body: new FormData(registerForm)
+  });
+
+  let result = await response.json();
+
+  if (result.error) {
+    swalError(result.error.title, result.error.message);
+  } else {
+    if (result.success) {
+      Swal.fire({
+        title: result.success.title,
+        html: result.success.message,
+        icon: "success",
+        iconColor: swalAlertColor.iconColor,
+        background: swalAlertColor.backgroundColor,
+        color: swalAlertColor.color,
+        didClose: () => location.reload()
+      });
+
+      registerForm.reset();
+    }
+  }
 });
 
 //helper functions:
@@ -172,4 +318,26 @@ function getGameSettings() {
   }
 
   return settings; //should be an object
+}
+
+function swalError(errorTitle, errorMessage) {
+  Swal.fire({
+    title: errorTitle,
+    text: errorMessage,
+    icon: "error",
+    iconColor: swalAlertColor.iconColor,
+    background: swalAlertColor.backgroundColor,
+    color: swalAlertColor.color
+  });
+}
+
+function swalSuccess(successTitle, successMessage) {
+  Swal.fire({
+    title: successTitle,
+    text: successMessage,
+    icon: "success",
+    iconColor: swalAlertColor.iconColor,
+    background: swalAlertColor.backgroundColor,
+    color: swalAlertColor.color
+  });
 }

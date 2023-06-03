@@ -1,0 +1,96 @@
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta property="og:title" content='Checkhouse "Rules"'/>
+    <meta property="og:type" content="website"/>
+    <meta property="og:url" content="https://checkhouse.cf"/>
+    <meta property="og:description" content="Chess, but cursed."/>
+    <meta property="og:image" content="/assets/logo.png"/>
+    <link rel="apple-touch-icon" sizes="180x180" href="/assets/favicon_package/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon_package/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon_package/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon_package/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon_package/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <title>"Rules"</title>
+    <link rel="stylesheet" href="/styles/tos.css">
+  </head>
+  <body>
+    <h1>Checkhouse: How to Play</h1>
+    <h3>(btw all of this is subject to change, if you have any ideas on how you can make our game even crazier, feel free to contact us and join the dev team!)</h3>
+    <h2>Gameplay</h2>
+    <p>
+      Same move rules as regular chess. Same castling, checkmate, stalemate, etc. rules.
+      <br><br>
+      
+      You get <strong>points</strong> for certain actions in the game:
+      <ul>
+        <li>When you take your opponent’s pieces, you get whatever that piece is currently worth in the game (starts out with normal chess piece values but increases by 25% every 15 moves)</li>
+        <li>When you check your opponent, you get 1 point. This can be changed by buying upgrades.</li>
+      </ul>
+    </p>
+    <br>
+    <h2>Stuff you can buy</h2>
+    <p>
+      <ul>
+        <li><span style="font-size:1.4em">Pieces</span>
+          <br><br>
+          <ul>
+            <li>Initial Prices:
+              <ul>
+                <li>Pawn - <strong>1 point</strong></li>
+                <li>Knight - <strong>3 points</strong></li>
+                <li>Bishop - <strong>3 points</strong></li>
+                <li>Rook - <strong>5 points</strong></li>
+                <li>Queen - <strong>9 points</strong></li>
+              </ul>
+            </li>
+            <br>
+            <li>Prices increase by 25% every 15 moves</li>
+            <br>
+            <li>On your turn, you can choose to purchase a piece and place it anywhere on the board like in a Crazyhouse game, or you can choose to purchase a piece and place it in your bank for future use and play a different piece that turn.</li>
+          </ul>
+        </li>
+        <br><br>
+        <li><span style="font-size:1.4em">Piece Upgrades</span>
+          <br><br>
+          <ul>
+            <li>Initial Prices:
+              <ul>
+                <li>Pawn to Knight/Bishop - <strong>3 points</strong></li>
+                <li>Knight/Bishop to Rook - <strong>4 points</strong></li>
+                <li>Rook to Queen - <strong>5 points</strong></li>
+                <li>Knight/Bishop to Queen - <strong>7 points</strong></li>
+              </ul>
+            </li>
+            <br>
+            <li>Prices increase by 25% every 15 moves</li>
+            <br>
+            <li>On your turn, you can upgrade a piece on the board as your "move", or you can upgrade a piece that's in your bank and play a different piece that turn.</li>
+          </ul>
+        </li>
+        <br><br>
+        <li><span style="font-size:1.4em">Defense/Attack Upgrades</span>
+          <br><br>
+          <ul>
+            <li>25% Check Protecc (stackable) - <strong>3 points</strong> - When your opponent checks you, they'll only get 75% of the points that they would normally get</li>
+            <br>
+            <li>25% Check Attack Upgrade (stackable [this will definitely be abused]) - <strong>3 points</strong> - Without any Check Attack Upgrades, you get 1 point for checking your opponent. With 1, you get 1.25 points/check, with 2, you get 1.56 points/check, etc.</li>
+            <br>
+            <li>25% Piece Capture Defense (stackable) - <strong>3 points</strong> - Ex. If your opponent captures your piece that’s worth 9 points, and you have 1 piece capture multiplier, they only get 6.75 points</li>
+            <br>
+            <li>25% Piece Capture Multiplier (stackable) - <strong>3 points</strong> - Ex. If you capture a piece worth 9 points, and you have 1 piece capture multiplier, you get 11.25 points</li>
+            <br>
+            <li>More to be added in the future...</li>
+          </ul>
+        </li>
+      </ul>
+    </p>
+    <div id="buttonContainer">
+      <button class="contentTheme" onclick="window.location.href='/'">Return to Home Page</button>
+    </div>
+  </body>
+</html>

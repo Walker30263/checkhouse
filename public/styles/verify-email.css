@@ -1,0 +1,59 @@
+@import './theme.css';
+
+* {
+  font-family: 'Lexend Deca', sans-serif;
+}
+
+body {
+  width: 95vw;
+  margin: auto;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+h1 {
+  text-align: center;
+}
+
+.loader {
+  border: 16px solid var(--secondary-content-text-color);
+  border-top: 16px solid var(--secondary-content-bg-color);
+  border-radius: 50%;
+  width: 150px;
+  height: 150px;
+  margin: auto;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+#status {
+ padding: 10px; 
+}
+
+#loader {
+  margin: 10vh auto;
+}
+
+#buttonContainer {
+  text-align: center;
+  display: none;
+}
+
+button {
+  font-size: 1.5em;
+  border-radius: 22px;
+  padding: 10px;
+  margin: 15px;
+  transition: 0.2s;
+  border: 2px solid;
+}
+
+button:hover {
+  filter: brightness(1.1);
+  cursor: pointer;
+  transform: scale(1.05);
+}

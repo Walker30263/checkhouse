@@ -35,6 +35,11 @@ button:hover {
   transform: scale(1.05);
 }
 
+h3 > a {
+  color: inherit;
+  text-decoration: none;
+}
+
 #profileContainer {
   margin: 10px;
   padding: 15px;
@@ -64,10 +69,15 @@ img {
   margin: 0 auto;
 }
 
-#username {
+#username, #ratingDisplay {
   font-weight: bold;
   font-size: 1.2em;
-  margin-top: 8px;
+  margin-top: 10px;
+}
+
+#bio {
+  margin-top: 10px;
+  font-size: 1.1em;
 }
 
 #guestUsernameInputContainer {
@@ -86,6 +96,10 @@ img {
 #guestUsernameInput:focus {
   border-width: 0 0 3px 0;
   filter: brightness(110%);
+}
+
+#loginOrRegister {
+  display: none;
 }
 
 #loginOrRegister > button {
@@ -165,4 +179,51 @@ img {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+
+#loginOrRegisterFormsContainer {
+  height: 0%;
+  width: 100%;
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  background-color: rgb(0,0,0); /* Black fallback color */
+  background-color: rgba(0,0,0, 0.75); /* Black w/opacity */
+  overflow-x: hidden; /* Disable horizontal scroll */
+  transition: 0.5s; /* 0.5 second transition effect to slide in or slide down the overlay (height or width, depending on reveal) */
+}
+
+/* Position the close button (top right corner) */
+#loginOrRegisterFormsContainer .closebtn {
+  position: absolute;
+  top: 0%;
+  right: 25%;
+  font-size: 60px;
+}
+
+/* When the height of the screen is less than 450 pixels, change the font-size of the links and position the close button again, so they don't overlap */
+@media screen and (max-height: 450px) {
+  #loginOrRegisterFormsContainer .closebtn {
+    font-size: 40px;
+    top: 15px;
+    right: 35px;
+  }
+}
+
+
+#loginOrRegisterFormsContainer > form {
+  display: none;
+  min-width: 300px;
+  width: 40vw;
+  margin: 25px auto;
+  padding: 15px 30px;
+  border-radius: 22px;
+}
+
+#loginOrRegisterFormsContainer > form > input[type=text], #loginOrRegisterFormsContainer > form > input[type=password], #loginOrRegisterFormsContainer > form > input[type=email] {
+  padding: 5px 10px;
+  border-radius: 22px;
+  width: 30%;
+  max-width: 300px;
 }

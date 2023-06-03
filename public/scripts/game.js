@@ -15,6 +15,10 @@ let btnJoinAsGuest = document.getElementById("joinAsGuest");
 let btnLogin = document.getElementById("login");
 let btnRegister = document.getElementById("register");
 
+let inviteSomeoneContainer = document.getElementById("inviteSomeoneContainer");
+let divInviteURL = document.getElementById("inviteURL");
+let btnCopyToClipboard = document.getElementById("copyToClipboard");
+
 let invalidGameCodeContainer = document.getElementById("invalidGameCodeContainer");
 let btnRedirectToMainPage = document.getElementById("redirectToMainPage");
 let chatContainer = document.getElementById("chatContainer");
@@ -45,9 +49,14 @@ guestUsernameInput.addEventListener("input", function() {
 });
 
 window.onload = function() {
+  if (localStorage.getItem("guestUsername")) {
+    guestUsernameInput.value = localStorage.getItem("guestUsername");
+    username.textContent = guestUsernameInput.value + " (Guest User)";
+  }
+  
   let token = localStorage.getItem("token"); //for logged-in users
-  let tempChallengerToken = localStorage.getItem("tempChallengerToken");
-  let refreshToken = localStorage.getItem("refreshToken");
+  let tempChallengerToken = sessionStorage.getItem("tempChallengerToken");
+  let refreshToken = sessionStorage.getItem("refreshToken");
   let url = window.location.href;
   let gameId = url.substring(url.lastIndexOf('/') + 1); //get the thing after the last / in the URL
   let gameTokenObj = {};
@@ -72,13 +81,6 @@ window.onload = function() {
       let img = document.createElement("img");
       img.src = "/assets/anonymous-pfp.png";
       profilePictureContainer.appendChild(img);
-      username.textContent = "Guest User";
-      guestUsernameInputContainer.style.display = "block";
-  
-      if (localStorage.getItem("guestUsername")) {
-        guestUsernameInput.value = localStorage.getItem("guestUsername");
-        username.textContent = guestUsernameInput.value + " (Guest User)";
-      }
   
       joinAsGuest.addEventListener("click", function() {
         socket.emit("requestGameInfo", gameTokenObj, gameId, guestUsernameInput.value + " (Guest User)");
@@ -87,16 +89,16 @@ window.onload = function() {
     }
   }
   
-  localStorage.removeItem("tempChallengerToken");
+  sessionStorage.removeItem("tempChallengerToken");
 }
 
 socket.on("invalidGameId", () => {
   invalidGameCodeContainer.style.display = "block";
 });
 
-socket.on("display", (game, state, refreshToken) => {
-  alert(state);
-  alert(JSON.stringify(game));
+socket.on("display", (game, state, refreshToken, spectator) => {
+  console.log(state);
+  console.log(game);
 
   board.position(game.position);
 
@@ -104,12 +106,19 @@ socket.on("display", (game, state, refreshToken) => {
     boardDiv.style.display = "inline-block";
     chatContainer.style.display = "inline-block";
     inviteSomeoneContainer.style.display = "none";
+
+    if (!spectator) {
+      reloadChat(game);
+    } else {
+      reloadSpectatorChat(game);
+    }
   } else {
     inviteSomeoneContainer.style.display = "block";
+    divInviteURL.textContent = `https://checkhouse.cf/${game.id}`;
   }
 
   if (refreshToken) {
-    localStorage.setItem("refreshToken", refreshToken);
+    sessionStorage.setItem("refreshToken", refreshToken);
   }
 });
 
@@ -147,3 +156,56 @@ socket.on("chatMessageReceive", (username, message) => {
   messagesContainer.appendChild(newMessage);
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
 });
+
+btnCopyToClipboard.addEventListener("click", function() {
+  navigator.clipboard.writeText(divInviteURL.textContent);
+
+  Swal.fire({
+    title: "Copied link to clipboard!",
+    icon: "success"
+  });
+});
+
+//retry but as if they didn't have a refreshToken saved in sessionStorage in the first place
+socket.on("invalidRefreshTokenRetryWithNullToken", () => {
+  let url = window.location.href;
+  let gameId = url.substring(url.lastIndexOf('/') + 1); //get the thing after the last / in the URL
+  let gameTokenObj = {};
+  gameTokenObj.type = "null";
+  gameTokenObj.token = null;
+  sessionStorage.removeItem("refreshToken");
+
+  requestGuestUserForScreenNameContainer.style.display = "block";
+      
+  let img = document.createElement("img");
+  img.src = "/assets/anonymous-pfp.png";
+  profilePictureContainer.appendChild(img);
+
+
+  joinAsGuest.addEventListener("click", function() {
+    socket.emit("requestGameInfo", gameTokenObj, gameId, guestUsernameInput.value + " (Guest User)");
+    requestGuestUserForScreenNameContainer.style.display = "none";
+  });
+});
+
+function reloadChat(gameData) {
+  for (message of gameData.playerChat) {
+    let newMessage = document.createElement("li");
+    let messageAuthor = document.createElement("span");
+    let messageContent = document.createElement("span");
+    messageAuthor.classList.add("messageAuthor");
+    messageContent.classList.add("messageContent");
+    messageAuthor.textContent = `${message.author}: `;
+    messageContent.textContent = message.message;
+    newMessage.appendChild(messageAuthor);
+    newMessage.appendChild(messageContent);
+    messagesContainer.appendChild(newMessage);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+}
+
+function reloadSpectatorChat(gameData) {
+  for (message of gameData.spectatorChat) {
+    console.log(message);
+  }
+}

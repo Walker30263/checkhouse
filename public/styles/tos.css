@@ -1,0 +1,47 @@
+@import './theme.css';
+
+* {
+  font-family: 'Lexend Deca', sans-serif;
+}
+
+body {
+  width: 95vw;
+  margin: auto;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+h1 {
+  text-align: center;
+}
+
+h2 {
+  margin-left: 10px;
+}
+
+h3 {
+  text-align: center;
+}
+
+p {
+  margin: 0 18px;
+}
+
+#buttonContainer {
+  text-align: center;
+}
+
+button {
+  font-size: 1.5em;
+  border-radius: 22px;
+  padding: 10px;
+  margin: 15px;
+  transition: 0.2s;
+  border: 2px solid;
+}
+
+button:hover {
+  filter: brightness(1.1);
+  cursor: pointer;
+  transform: scale(1.05);
+}

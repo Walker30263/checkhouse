@@ -56,6 +56,10 @@ class Game {
         break;
       }
     }
+
+    if (this.challenger.id === oldId) {
+      this.challenger.updateId(newId);
+    }
   }
 
   newMessage(author, message, timestamp, chat) {

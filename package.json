@@ -18,9 +18,14 @@
   },
   "homepage": "https://github.com/Walker30263/checkhouse#readme",
   "dependencies": {
+    "@sendgrid/mail": "^7.7.0",
+    "bcrypt": "^5.1.0",
     "express": "^4.18.2",
+    "hcaptcha": "^0.1.1",
     "jsonwebtoken": "^8.5.1",
+    "multer": "^1.4.5-lts.1",
     "socket.io": "^4.5.4",
-    "sqlite3": "^5.1.2"
+    "sqlite3": "^5.1.2",
+    "validator": "^13.9.0"
   }
 }

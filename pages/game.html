@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="/styles/game.css">
     <script src="/scripts/game.js" defer></script>
     <script src="/socket.io/socket.io.js"></script>
-
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Importing chessboard.js -->
     <link rel="stylesheet" href="https://unpkg.com/@chrisoakman/chessboardjs@1.0.0/dist/chessboard-1.0.0.min.css" integrity="sha384-q94+BZtLrkL1/ohfjR8c6L+A6qzNH9R2hBLwyoAfu3i/WCvQjzL2RQJ3uNHDISdU" crossorigin="anonymous">
     <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script>
@@ -29,7 +29,7 @@
     <div id="requestGuestUserForScreenNameContainer">
       <h1>Join Game as Guest</h1>
       <div id="profilePictureContainer"></div>
-      <div id="username"></div>
+      <div id="username">Guest User</div>
       <div id="guestUsernameInputContainer">
         <!-- Input validation script credit: https://stackoverflow.com/a/46903763 -->
         Play as <input id="guestUsernameInput" type="text" maxlength="20" class="contentTheme" onkeypress="return event.charCode >= 48 && event.charCode <= 57 || event.charCode >= 97 && event.charCode <= 122 || event.charCode >= 65 && event.charCode <= 90 || event.charCode == 32">
@@ -48,7 +48,22 @@
     <div id="inviteSomeoneContainer" class="contentTheme">
       <h1>Challenge to a game</h1>
       <div id="gameInfo">
-        
+        <span id="gameInfo_gameTime"></span>
+        <span id="gameInfo_gameColor"></span>
+      </div>
+      <div class="wrapper">
+        <div class="secondaryContentTheme">
+          <h3>Share this URL with someone:</h3>
+          <div id="urlContainer">
+            <div id="inviteURL" class="contentTheme"></div>
+            <button id="copyToClipboard" class="secondaryContentTheme">Share 🔗</button>
+          </div>
+          <h3>The first person to click the URL will be able to join your game</h3>
+        </div>
+        <div class="secondaryContentTheme">
+          <h3>Or, challenge an existing Checkhouse user:</h3>
+          <input id="searchForUsername" placeholder="Search username..." class="contentTheme">
+        </div>
       </div>
     </div>
     <div id="chatContainer" class="contentTheme">

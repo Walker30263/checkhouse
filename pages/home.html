@@ -18,15 +18,20 @@
     <title>Checkhouse</title>
     <link rel="stylesheet" href="/styles/home.css">
     <script src="/scripts/home.js" defer></script>
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://js.hcaptcha.com/1/api.js" async defer></script>
+    <script src="https://kit.fontawesome.com/d86f153d06.js" crossorigin="anonymous"></script>
   </head>
   <body>
     <h1>Checkhouse - Chess but Cursed</h1>
-    <h3>Crazyhouse + Three-Check + r/AnarchyChess = ???</h3>
+    <h3>Crazyhouse + Three-Check + r/AnarchyChess = <a href="/rules" target="_blank" rel="noopener noreferrer"><span style="text-decoration:underline;">How to play</span>  <i class="fa-solid fa-arrow-up-right-from-square"></i></a></h3>
     <div class="wrapper">
       <div>
         <div id="profileContainer">
           <div id="profilePictureContainer"></div>
           <div id="username"></div>
+          <div id="ratingDisplay"></div>
+          <div id="bio"></div>
           <div id="guestUsernameInputContainer">
             <!-- Input validation script credit: https://stackoverflow.com/a/46903763 -->
             Play as <input id="guestUsernameInput" type="text" maxlength="20" class="contentTheme" onkeypress="return event.charCode >= 48 && event.charCode <= 57 || event.charCode >= 97 && event.charCode <= 122 || event.charCode >= 65 && event.charCode <= 90 || event.charCode == 32">
@@ -75,6 +80,60 @@
           <div class="loader"></div>
           <button class="contentTheme" id="cancelMatchmaking">Cancel</button>
         </div>
+      </div>
+      <div id="loginOrRegisterFormsContainer">
+        <!-- Button to close the overlay navigation -->
+        <a class="closebtn" onclick="closeOverlay()">&times;</a>
+        <form id="loginForm" class="contentTheme">
+          <h1>Log In</h1>
+          <label for="usernameLogin">Username</label>
+          <br>
+          <input id="usernameLogin" name="username" class="secondaryContentTheme" type="text" autocomplete="username" required onkeypress="return event.charCode != 32"></input>
+          <br>
+          <br>
+          <label for="passwordLogin">Password</label>
+          <br>
+          <input id="passwordLogin" name="password" class="secondaryContentTheme" type="password" minlength="8" maxlength="30" autocomplete="current-password" required onkeypress="return event.charCode != 32"></input>
+          <br>
+          <br>
+          <label for="rememberMe">Remember Me</label>
+          <input id="rememberMe" name="rememberMe" type="checkbox">
+          <br><br>
+          <div id="h-captcha-login-form" class="h-captcha" data-sitekey="6d979865-54d8-4f35-a5e8-673196af0e15" data-theme="dark"></div>
+          <button id="login" type="submit" class="secondaryContentTheme">Login</button>
+          <button id="btnSwitchToRegisterForm" type="button" class="secondaryContentTheme">Register Instead</button>
+          <br><br>
+          <a href="/forgot-password" style="font-size:1.3em;">Forgot Password</a>
+        </form>
+        
+        <form id="registerForm" class="contentTheme">
+          <h1>Sign Up</h1>
+          <label for="usernameSignUp">Username</label>
+          <br>
+          <input id="usernameSignUp" name="username" class="secondaryContentTheme" type="text" required autocomplete="off" onkeypress="return event.charCode != 32"></input>
+          <br>
+          <br>
+          <label for="email">Email (optional)</label>
+          <br>
+          <input type="email" name="email" class="secondaryContentTheme" id="email" autocomplete="email"></input>
+          <br>
+          <br>
+          <label for="passwordSignUp">Password</label>
+          <br>
+          <input id="passwordSignUp" name="password" class="secondaryContentTheme" type="password" required autocomplete="new-password" onkeypress="return event.charCode != 32" minlength="8"></input>
+          <br>
+          <br>
+          <label for="confirmPassword">Confirm Password</label>
+          <br>
+          <input id="confirmPassword" name="confirmPassword" class="secondaryContentTheme" type="password" required autocomplete="new-password" onkeypress="return event.charCode != 32" minlength="8"></input>
+          <br>
+          <br> 
+          <span id="beOver13">By signing up, you agree to our <a href="/tos" target="_blank" rel="noopener noreferrer">Terms of Service</a></span>
+          <br><br>
+          <div id="h-captcha-register-form" class="h-captcha" data-sitekey="6d979865-54d8-4f35-a5e8-673196af0e15" data-theme="dark"></div>
+          <button id="signUp" type="submit" class="secondaryContentTheme">Sign Up</button>
+          <button id="btnSwitchToLoginForm" type="button" class="secondaryContentTheme">Log In Instead</button>
+        </form>
       </div>
     </div>
   </body>
